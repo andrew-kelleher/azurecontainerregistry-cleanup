@@ -1,5 +1,5 @@
 # Azure Container Registry Cleanup
-To maintain the size of your Azure Container Registry you should reguarly delete old images. This script leverages Azure's **az acr repository** command to scan for and delete old images.
+To maintain the size of your Azure Container Registry you should reguarly delete old images. This script leverages Azure's **az acr repository** command to scan for and delete surplus images.
 
 An example of where this script is useful is where multiple images are created during a continuous integration (CI) process.
 
@@ -17,28 +17,24 @@ These instructions will allow you to run the PowerShell script. The script can e
 ## Parameters
 * **AzureRegistryName** (required) - provide the name of the target Azure Container Registry
 * **SubscriptionName** (optional) - if login is associated with only one subscription, then you do not need to provide this. If not, this can be used to set the context in which container registry is located
-* * **Repository** (optional) - specify the repository to scan for surplus images to delete. If omitted all repositories will be be scanned within the specified container registry
+* **Repository** (optional) - specify the repository to scan for surplus images to delete. If omitted all repositories will be be scanned within the specified container registry
 * **ImagestoKeep** (optional) - the number of images per repository to retain (default = 10)
 * **EnableDelete** (optional) - enable actual deletion of images instead of just scanning for surplus images (default = no, change to "yes" to delete images)
 
 
 ## Examples
-* Example 1:
-.\acr-cleanup.ps1 -azureregistryname stratis 
+* Example 1: **.\acr-cleanup.ps1 -azureregistryname yourregistryname**
 
 In this case, script will default to scanning for images to delete (ImagestoKeep = 10 and EnableDelete = "no")
 
-* Example 2:
-.\acr-cleanup.ps1 -azureregistryname stratis -enabledelete yes
+* Example 2: **.\acr-cleanup.ps1 -azureregistryname yourregistryname -enabledelete yes**
 
 In this case, script will delete any surplus images above the default of 10 images
 
-* Example 3:
-.\acr-cleanup.ps1 -azureregistryname stratis -enabledelete yes -imagestokeep 20
+* Example 3: **.\acr-cleanup.ps1 -azureregistryname yourregistryname -enabledelete yes -imagestokeep 20**
 
 In this case, script will delete any surplus images above 20 images per repository
 
-* Example 4:
-.\acr-cleanup.ps1 -azureregistryname stratis -enabledelete yes -repository ingest
+* Example 4: **.\acr-cleanup.ps1 -azureregistryname yourregistryname -enabledelete yes -repository yourrepositoryname**
 
-In this case, sceipt will delete any surplus images within the "ingest" repository
+In this case, sceipt will delete any surplus images within the "yourrepositoryname" repository
