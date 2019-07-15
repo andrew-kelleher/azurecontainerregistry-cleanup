@@ -37,4 +37,4 @@ In this case, script will delete any surplus images above 20 images per reposito
 
 * Example 4: **.\acr-cleanup.ps1 -azureregistryname yourregistryname -enabledelete yes -repository yourrepositoryname**
 
-In this case, sceipt will delete any surplus images within the "yourrepositoryname" repository
+In this case, script will delete any surplus images within the "yourrepositoryname" repository
