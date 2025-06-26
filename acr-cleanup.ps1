@@ -26,7 +26,12 @@ Param(
     # Specify repository to cleanup (if not specified will default to all repositories within the registry)
     [Parameter (Mandatory=$false)]
     [ValidateNotNullOrEmpty()]
-    [String] $Repository
+    [String] $Repository,
+
+    # Specify number of paralell workers
+    [Parameter (Mandatory=$false)]
+    [ValidateNotNullOrEmpty()]
+    [int] $ThrottleLimit = 2
 )
 
 $imagesDeleted = 0
@@ -44,6 +49,7 @@ else {
     $RepoList = az acr repository list --name $AzureRegistryName --output table
 }
 
+
 for($index=2; $index -lt $RepoList.length; $index++){
     $RepositoryName = $RepoList[$index]
 
@@ -53,18 +59,19 @@ for($index=2; $index -lt $RepoList.length; $index++){
     write-host "# Total images:"$RepositoryTags.length" # Images to keep:"$ImagestoKeep
 
     if ($RepositoryTags.length -gt $ImagestoKeep) {
-        write-host "Deleting surplus images..."
-        for ($item=$ImagestoKeep; $item -lt $RepositoryTags.length; $item++) {
-            $ImageName = $RepositoryName + ":" + $RepositoryTags[$item]
-            $imagesDeleted++
-            if ($EnableDelete -eq "yes") {
+
+        $RepositoryTags = $RepositoryTags[$ImagestoKeep..$RepositoryTags.Length]
+
+        $RepositoryTags | ForEach-Object -ThrottleLimit $ThrottleLimit -Parallel {
+            $ImageName = $using:RepositoryName + ":" + $_
+            if ($using:EnableDelete -eq "yes") {
                 write-host "deleting:"$ImageName
-                az acr repository delete --name $AzureRegistryName --image $ImageName --yes 
+                az acr repository delete --name $using:AzureRegistryName --image $ImageName --yes 
             }
             else {
                 write-host "dummy delete:"$ImageName
             }
-        }
+        } 
     }
     else {
         write-host "No surplus images to delete."
